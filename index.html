@@ -1,1 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VA Response Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary: #00a37f; /* ChatGPT color */
+            --secondary: #8e44ad; /* Gemini color */
+            --light: #ffffff; /* White */
+            --shadow-hover: 0 8px 20px rgba(0, 163, 127, 0.2);
+            --animate-speed: 0.3s;
+        }
 
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes floatIn {
+            from { 
+                transform: translateY(-10px) scale(0.95);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: var(--light);
+            color: var(--primary);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            animation: slideIn 0.5s ease;
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease;
+        }
+
+        .header {
+            background: var(--primary);
+            color: var(--light);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .client-info {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(0, 163, 127, 0.1);
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 163, 127, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .chat-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all var(--animate-speed) ease;
+            animation: floatIn 0.5s ease;
+        }
+
+        .tabs {
+            display: flex;
+            padding: 10px;
+            gap: 10px;
+            background: var(--light);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--light);
+            border: 2px solid var(--primary);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: var(--light);
+            border-color: var(--primary);
+        }
+
+        .messages {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            margin: 8px 0;
+            border-radius: 20px;
+            animation: fadeIn 0.3s ease;
+            transition: all var(--animate-speed) ease;
+        }
+
+        .client {
+            background: rgba(0, 163, 127, 0.1);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        .va {
+            background: var(--primary);
+            color: var(--light);
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0, 163, 127, 0.1);
+        }
+
+        .input-area {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-top: 2px solid var(--primary);
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            backdrop-filter: blur(5px);
+        }
+
+        .message-type {
+            width: 100px;
+        }
+
+        .send-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary);
+            color: var(--light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            padding: 12px;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            background: var(--light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn.active, .action-btn:hover {
+            background: var(--primary);
+            color: var(--light);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .prompt-box {
+            background: var(--secondary);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.5s ease;
+            transition: all 0.3s ease;
+            border: 2px solid var(--primary);
+        }
+
+        .prompt-content {
+            white-space: pre-wrap;
+            font-family: monospace;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .prompt-box textarea {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .prompt-box textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 163, 127, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .ai-tools {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .ai-link {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 12px;
+            color: var(--light);
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .ai-link:hover {
+            transform: translateY(-2px);
+        }
+
+        .chatgpt { background: #00a37f; }
+        .gemini { background: #8e44ad; }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .actions { grid-template-columns: 1fr; }
+            .input-area { flex-direction: column; }
+            .message-type { width: 100%; margin-bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="brand-header">
+            <h1>VA Response Generator</h1>
+        </div>
+
+        <div class="header">
+            <div class="client-info">
+                <input type="text" placeholder="Client Name" id="clientName">
+                <select id="clientField">
+                    <option value="">Select Field</option>
+                    <option value="Business">Business Coach</option>
+                    <option value="Fitness">Fitness Coach</option>
+                    <option value="Health">Health Coach</option>
+                    <option value="Life">Life Coach</option>
+                    <option value="Mindset">Mindset Coach</option>
+                    <option value="Sales">Sales Coach</option>
+                </select>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" onclick="switchView('builder')">Message Builder</div>
+                <div class="tab" onclick="switchView('paste')">Paste Conversation</div>
+            </div>
+        </div>
+
+        <div class="chat-box" id="builderView">
+            <div class="messages" id="messageArea"></div>
+            <div class="input-area">
+                <select class="message-type">
+                    <option value="client">Client</option>
+                    <option value="va">VA</option>
+                </select>
+                <textarea placeholder="Type message..." rows="1"></textarea>
+                <button class="send-btn" onclick="addMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-box" id="pasteView" style="display: none;">
+            <textarea placeholder="Paste your conversation here..." rows="10"></textarea>
+        </div>
+
+        <div class="actions">
+            <button class="action-btn" onclick="toggleAction(this)">
+                <i class="fas fa-shield-alt"></i> Objection
+            </button>
+            <button class="action-btn" onclick="toggleAction(this)">
+                <i class="fas fa-calendar"></i> Booking
+            </button>
+            <button class="action-btn" onclick="toggleAction(this)">
+                <i class="fas fa-bullseye"></i> Goals
+            </button>
+            <button class="action-btn" onclick="toggleAction(this)">
+                <i class="fas fa-question"></i> Open Q's
+            </button>
+        </div>
+
+        <div class="prompt-box" id="promptOutput">
+            <div class="prompt-content"></div>
+            <textarea placeholder="Type your prompt here..."></textarea>
+            <button class="action-btn" onclick="copyPrompt()">
+                <i class="fas fa-copy"></i> Copy Prompt
+            </button>
+        </div>
+
+        <div class="ai-tools">
+            <a href="https://chat.openai.com" class="ai-link chatgpt" target="_blank">
+                <i class="fas fa-robot"></i> ChatGPT
+            </a>
+            <a href="https://gemini.google.com" class="ai-link gemini" target="_blank">
+                <i class="fas fa-brain"></i> Gemini
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let activeActions = new Set();
+
+        function switchView(view) {
+            document.querySelectorAll('.tab').forEach(tab => 
+                tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('builderView').style.display = 
+                view === 'builder' ? 'block' : 'none';
+            document.getElementById('pasteView').style.display = 
+                view === 'paste' ? 'block' : 'none';
+        }
+
+        function addMessage() {
+            const type = document.querySelector('.message-type').value;
+            const text = document.querySelector('.input-area textarea').value.trim();
+            
+            if (text) {
+                const message = document.createElement('div');
+                message.className = `message ${type}`;
+                message.textContent = text;
+                
+                document.getElementById('messageArea').appendChild(message);
+                document.querySelector('.input-area textarea').value = '';
+                message.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function toggleAction(btn) {
+            btn.classList.toggle('active');
+        }
+
+        function generatePrompt() {
+            const clientName = document.getElementById('clientName').value;
+            const clientField = document.getElementById('clientField').value;
+            
+            let conversation;
+            if (document.getElementById('builderView').style.display !== 'none') {
+                conversation = Array.from(document.querySelectorAll('.message'))
+                    .map(msg => `${msg.classList.contains('client') ? 'CLIENT' : 'VA'}: ${msg.textContent}`)
+                    .join('\n');
+            } else {
+                conversation = document.querySelector('#pasteView textarea').value;
+            }
+
+            const prompt = `As a VA for WDY Marketing, I need unique responses from both Cole Gordon and Jeremy Miner for this conversation:
+
+${conversation}
+
+BUSINESS FRAMEWORK:
+- VA appointment setting service
+- Organic lead generation (10-15 leads/30 days)
+- Professional outreach across platforms
+- Focus on booking qualified strategy calls
+
+DAILY VA TARGETS:
+• LinkedIn: 30-50 connections, 20+ outreach messages
+• Facebook: 20 comments, 30-50 targeted requests
+• Instagram: 40 personalized outreach messages
+
+COMMON RESPONSES & OBJECTION HANDLING:
+• Trust Issues: "Thank you for understanding. At WDY Marketing, we respect cultural differences..."
+• Cost Concerns: "I completely understand, building your own marketing and sales plan..."
+• Location: "WDY Marketing is US-based with a global team..."
+• Experience Proof: "We have happy clients with video testimonials..."
+
+GOAL EXPLORATION:
+• "Could you share about your goals?"
+• "What's your biggest struggle: finding clients, cold DMs, or lead generation?"
+• "How are you currently generating leads?"
+
+Please provide TWO DISTINCT RESPONSES with analysis:
+
+| Cole Gordon | [look into his video and scripts how he speaks to client, high-ticket style] | • Tone analysis
+• Sentence structure
+• Question strategy
+• Emotional impact |
+
+| Jeremy Miner | [how he responds based on his NEPQ style] | • Tone analysis
+• Sentence structure
+• Question strategy
+• Emotional impact |
+
+✨ HIGHLIGHT RECOMMENDATION:
+Based on the conversation context and client type, explain which response would likely be more effective and why.
+
+Remember:
+• Keep DM-appropriate tone
+• Sound natural, not scripted
+• Move toward booking call
+• Include relevant VA capabilities
+• Handle any objections professionally
+
+Just give me the reply easy for me to copy and paste, don't need detail, just simple reply.
+
+PI code 2019: [Insert PI code 2019 here]`;
+
+            document.querySelector('.prompt-box').style.display = 'block';
+            document.querySelector('.prompt-content').textContent = prompt;
+        }
+
+        function copyPrompt() {
+            const promptText = document.querySelector('.prompt-content').textContent;
+            navigator.clipboard.writeText(promptText).then(() => {
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => btn.innerHTML = originalText, 2000);
+            });
+        }
+
+        // Handle mobile/desktop AI tool links
+        document.addEventListener('DOMContentLoaded', () => {
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (isMobile) {
+                document.querySelectorAll('.ai-link').forEach(link => {
+                    link.target = '_self';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
