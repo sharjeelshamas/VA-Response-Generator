@@ -1,0 +1,491 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DM Response Generator</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00b3b3;
+            --secondary-color: #008080;
+            --accent-color: #40e0d0;
+            --gradient-start: #e6ffff;
+            --gradient-end: #ccffff;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --border-color: rgba(0, 179, 179, 0.2);
+            --success-color: #00868b;
+            --mobile-button-color: #00868b;
+            --desktop-button-color: #006666;
+            --linkedin-color: #0077b5;
+            --facebook-color: #1877f2;
+            --instagram-color: #e4405f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .background-shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .shape-1 {
+            background: var(--accent-color);
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            right: -100px;
+            animation-delay: -2s;
+        }
+
+        .shape-2 {
+            background: var(--primary-color);
+            width: 400px;
+            height: 400px;
+            bottom: -150px;
+            left: -150px;
+            animation-delay: -4s;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 8px 32px rgba(0, 179, 179, 0.1),
+                0 2px 8px rgba(0, 179, 179, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            position: relative;
+        }
+
+        .header:after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            transform: translateX(-50%);
+        }
+
+        .header h2 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            background-size: 200% 200%;
+            animation: gradientFlow 8s ease infinite;
+        }
+</style>
+
+```
+Here's Part 2 with additional CSS styling and the start of the HTML structure:
+
+```html
+@keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .input-section {
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .select-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .custom-select, .custom-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.75rem 0;
+        }
+
+        .option-button {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-primary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-button.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 179, 179, 0.2);
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary-color);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        #copyMobileButton, #copyDesktopButton {
+            background: var(--mobile-button-color);
+            margin-bottom: 0.5rem;
+        }
+
+        #copyDesktopButton {
+            background: var(--desktop-button-color);
+            opacity: 0.9;
+        }
+
+        .generated-content {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0, 179, 179, 0.1);
+        }
+
+        #generatedContent {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-shape shape-1"></div>
+    <div class="background-shape shape-2"></div>
+
+    <div class="container">
+        <div class="header">
+            <h2>WDY Marketing</h2>
+            <h3 class="subtitle">DM Response Generator</h3>
+            <p class="subtitle">Create personalized DM replies in seconds</p>
+        </div>
+
+Here's Part 3 with the form elements:
+
+```html
+<div class="input-section">
+            <label>
+                <i class="fas fa-share-nodes icon"></i> Platform:
+            </label>
+            <div class="button-group">
+                <button class="platform-button linkedin" data-platform="linkedin">
+                    <i class="fab fa-linkedin"></i> LinkedIn
+                </button>
+                <button class="platform-button facebook" data-platform="facebook">
+                    <i class="fab fa-facebook"></i> Facebook
+                </button>
+                <button class="platform-button instagram" data-platform="instagram">
+                    <i class="fab fa-instagram"></i> Instagram
+                </button>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <label>
+                <i class="fas fa-briefcase icon"></i> Client Type:
+            </label>
+            <div class="select-group">
+                <select id="clientType" class="custom-select">
+                    <optgroup label="Coaches">
+                        <option value="business">Business Coach</option>
+                        <option value="fitness">Fitness Coach</option>
+                        <option value="health">Health Coach</option>
+                        <option value="life">Life Coach</option>
+                        <option value="mindset">Mindset Coach</option>
+                        <option value="sales">Sales Coach</option>
+                        <option value="marketing">Marketing Coach</option>
+                        <option value="leadership">Leadership Coach</option>
+                        <option value="weightloss">Weight Loss Coach</option>
+                        <option value="career">Career Coach</option>
+                        <option value="relationship">Relationship Coach</option>
+                        <option value="speaking">Public Speaking Coach</option>
+                        <option value="spiritual">Spiritual Coach</option>
+                        <option value="parenting">Parenting Coach</option>
+                        <option value="sports">Sports Coach</option>
+                        <option value="other">Other Coach Type</option>
+                    </optgroup>
+                    <optgroup label="Other Industries">
+                        <option value="real-estate">Real Estate</option>
+                        <option value="ecommerce">E-commerce</option>
+                        <option value="consulting">Consulting</option>
+                        <option value="other-industry">Other Industry</option>
+                    </optgroup>
+                </select>
+                <input type="text" id="otherIndustry" class="custom-input" placeholder="Specify Industry" style="display: none;">
+            </div>
+        </div>
+
+        <div class="input-section">
+            <label>
+                <i class="fas fa-user icon"></i> Client's Name:
+            </label>
+            <input type="text" id="clientName" class="custom-input" placeholder="Enter Client's Name">
+        </div>
+
+        <div class="input-section">
+            <label>
+                <i class="fas fa-comments icon"></i> Conversation Type:
+            </label>
+            <div class="button-group">
+                <button class="option-button active" data-conversation="initial">Initial Contact</button>
+                <button class="option-button" data-conversation="follow-up">Follow-up</button>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <label>
+                <i class="fas fa-comment-alt icon"></i> Conversation History:
+            </label>
+            <textarea id="conversationHistory" class="custom-input" rows="6" placeholder="Paste the conversation history here"></textarea>
+        </div>
+
+        <div class="input-section">
+            <label>
+                <i class="fas fa-reply icon"></i> Reply Type:
+            </label>
+            <div class="button-group">
+                <button class="option-button" data-reply-type="send-info">Send Information</button>
+                <button class="option-button" data-reply-type="handle-objection">Handle Objection</button>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <label>
+                <i class="fas fa-link icon"></i> Add Resources:
+            </label>
+            <div class="button-group">
+                <button class="option-button" data-resource="checklist">VA Checklist</button>
+                <button class="option-button" data-resource="booking">Booking Link</button>
+            </div>
+        </div>
+
+<button id="generateReplyBtn" class="action-button">
+            <i class="fas fa-magic"></i> Generate Responses
+        </button>
+
+        <div class="generated-content">
+            <label for="generatedContent">
+                <i class="fas fa-magic icon"></i> Generated Content:
+            </label>
+            <textarea id="generatedContent" rows="8" readonly></textarea>
+        </div>
+
+        <button id="copyMobileButton" class="action-button">
+            <i class="fas fa-mobile-alt"></i> Copy & Open Gemini (Mobile)
+        </button>
+        <button id="copyDesktopButton" class="action-button">
+            <i class="fas fa-laptop"></i> Copy & Open Gemini (Desktop)
+        </button>
+    </div>
+
+    <script>
+    const predefinedPin = "2019";
+    const RESOURCES = {
+        checklist: "https://drive.google.com/file/d/1SJ2kzA2AvACxgc4gSxtlvtD2SjNR6uWG/view",
+        booking: "https://info.wdymarketing.com/widget/bookings/wdy30minutes"
+    };
+
+    $(document).ready(function() {
+        // Handle button selections
+        $('.button-group').on('click', '.option-button, .platform-button', function() {
+            $(this).siblings().removeClass('active');
+            $(this).addClass('active');
+        });
+
+        // Handle industry selection
+        $('#clientType').change(function() {
+            const value = $(this).val();
+            $('#otherIndustry').toggle(value === 'other' || value === 'other-industry');
+        });
+
+        // Generate button click
+        $('#generateReplyBtn').click(function() {
+            validatePin(generateReply);
+        });
+
+        // Gemini Mobile button
+        $('#copyMobileButton').click(function() {
+            handleCopyAndOpen(this, 'mobile');
+        });
+
+        // Gemini Desktop button
+        $('#copyDesktopButton').click(function() {
+            handleCopyAndOpen(this, 'desktop');
+        });
+
+        // Resource button clicks
+        $('[data-resource]').click(function() {
+            const resourceType = $(this).data('resource');
+            const link = RESOURCES[resourceType];
+            appendResourceToPrompt(resourceType, link);
+        });
+    });
+
+    function validatePin(callback) {
+        const userPin = prompt("Enter the PIN to proceed:");
+        if (userPin === predefinedPin) {
+            callback();
+        } else {
+            alert("Incorrect PIN. Access denied.");
+        }
+    }
+
+    function appendResourceToPrompt(type, link) {
+        let currentContent = $('#generatedContent').val();
+        const resourceText = type === 'checklist' ? 
+            `\nVA Checklist: ${link}` : 
+            `\nBooking Link: ${link}`;
+        $('#generatedContent').val(currentContent + resourceText);
+    }
+
+    function handleCopyAndOpen(button, type) {
+        const content = $('#generatedContent').val();
+        navigator.clipboard.writeText(content).then(() => {
+            showCopySuccess(button, type);
+        }).catch(err => {
+            fallbackCopyTextToClipboard(content, button, type);
+        });
+    }
+
+    function showCopySuccess(button, type) {
+        $(button).html('<i class="fas fa-check"></i> Copied!');
+        setTimeout(() => {
+            if (type === 'desktop') {
+                $(button).html('<i class="fas fa-laptop"></i> Copy & Open Gemini (Desktop)');
+                window.open('https://gemini.google.com/app', '_blank');
+            } else {
+                $(button).html('<i class="fas fa-mobile-alt"></i> Copy & Open Gemini (Mobile)');
+                window.location.href = 'https://gemini.google.com/app';
+            }
+        }, 1000);
+    }
+
+    function generateReply() {
+        const clientName = $('#clientName').val().trim();
+        const conversation = $('#conversationHistory').val().trim();
+        const platform = $('.platform-button.active').data('platform');
+        const clientType = $('#clientType').val();
+        const otherIndustry = $('#otherIndustry').val();
+        const industry = clientType === 'other' || clientType === 'other-industry' ? otherIndustry : clientType;
+        const conversationType = $('[data-conversation].active').data('conversation');
+        const replyType = $('[data-reply-type].active').data('reply-type');
+
+        if (!clientName || !conversation || !platform) {
+            alert("Please fill in all required fields.");
+            return;
+        }
+
+        const prompt = generatePrompt({
+            clientName,
+            conversation,
+            platform,
+            industry,
+            conversationType,
+            replyType
+        });
+
+        $('#generatedContent').val(prompt);
+    }
+
+    function generatePrompt(data) {
+        return `Generate two DM responses on ${data.platform} for ${data.clientName} (${data.industry}):
+
+1. Cole Gordon Style Response:
+Consider their psychology, use high-ticket sales principles, and maintain authority.
+
+2. Jeremy Miner Style Response:
+Use NEPQ methodology, focusing on pain points and collaborative problem-solving.
+
+Conversation History:
+${data.conversation}
+
+Guidelines:
+- Keep responses natural for ${data.platform}
+- This is a ${data.conversationType} contact
+- Focus on ${data.replyType === 'send-info' ? 'providing value and information' : 'addressing objections'}
+- Include clear call-to-action
+- Maintain WDY Marketing's voice
+
+Please provide both responses with a recommendation on which might be more effective in this context.`;
+    }
+    </script>
+</body>
+</html>
